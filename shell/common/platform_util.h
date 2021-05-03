@@ -56,6 +56,8 @@ bool SetLoginItemEnabled(bool enabled);
 // Returns a success flag.
 // Unlike libgtkui, does *not* use "chromium-browser.desktop" as a fallback.
 bool GetDesktopName(std::string* setme);
+
+static std::string gdk_backend;
 #endif
 
 }  // namespace platform_util

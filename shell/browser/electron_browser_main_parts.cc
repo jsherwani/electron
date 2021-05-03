@@ -377,6 +377,14 @@ void ElectronBrowserMainParts::PostDestroyThreads() {
 
 void ElectronBrowserMainParts::ToolkitInitialized() {
 #if defined(OS_LINUX)
+  // This is set by Chromium here:
+  // https://chromium-review.googlesource.com/c/chromium/src/+/2586184
+  // and can detrimentally affect external app behaviors, so we want to
+  // check if the user has set it so we can use it later.
+  std::string gdk_backend;
+  if (base::Environment::Create()->GetVar("GDK_BACKEND", &gdk_backend))
+    platform_util::gdk_backend = gdk_backend;
+
   auto linux_ui = BuildGtkUi();
   linux_ui->Initialize();
 
