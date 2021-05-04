@@ -69,6 +69,10 @@
 #include "ui/base/ui_base_features.h"
 #endif
 
+#if defined(USE_OZONE)
+#include "ui/ozone/platform/wayland/host/wayland_toplevel_window.h"
+#endif
+
 #elif defined(OS_WIN)
 #include "base/win/win_util.h"
 #include "shell/browser/ui/views/win_frame_view.h"
@@ -1062,6 +1066,18 @@ void NativeWindowViews::SetIgnoreMouseEvents(bool ignore, bool forward) {
           .source_bitmap = x11::Pixmap::None,
       });
     }
+  } else {
+    // note: this assumes we are in wayland, but Ozone supports X11 too
+    // is there a way to confirm we are indeed on the wayland ozone platform?
+    ui::WaylandToplevelWindow* waylandToplevelWindow =
+        static_cast<ui::WaylandToplevelWindow*>(
+            views::DesktopWindowTreeHostPlatform::GetHostForWidget(
+                GetAcceleratedWidget())
+                ->platform_window());
+    gfx::Rect rect =
+        ignore ? gfx::Rect(0, 0) : waylandToplevelWindow->GetBounds();
+    waylandToplevelWindow->root_surface()->SetInputRegion(rect);
+    waylandToplevelWindow->root_surface()->Commit();
   }
 #endif
 }
